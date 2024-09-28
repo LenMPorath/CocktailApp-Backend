@@ -1,0 +1,19 @@
+# Virtuelle Umgebungen
+venv/
+
+# Python Cache-Dateien
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Datenbanken
+cocktail.db
+
+# Entwicklungsumgebung Dateien
+*.env
+*.DS_Store
+
+# IDEs
+.vscode/
+.idea/
