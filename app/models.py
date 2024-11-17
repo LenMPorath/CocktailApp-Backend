@@ -1,7 +1,11 @@
+import os
 from sqlalchemy import Boolean, Column, DateTime, Integer, Float, Enum, ForeignKey, String
 from sqlalchemy.orm import relationship
 from .database import Base
 from .enums import UnitEnum
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class User(Base):
     __tablename__ = 'users'
@@ -9,9 +13,19 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True)
     password_hash = Column(String, nullable=True)
+    salt = Column(String, nullable=True)
 
     orders = relationship("Order", back_populates="user")
     favorites = relationship("Favorite", back_populates="user")
+
+    def set_password(self, password: str):
+        """Generiert einen Salt, hasht das Passwort und speichert den Hash."""
+        self.salt = os.urandom(16).hex()
+        self.password_hash = pwd_context.hash(password + self.salt)
+
+    def verify_password(self, password: str) -> bool:
+        """Verifiziert, ob das Passwort korrekt ist."""
+        return pwd_context.verify(password + self.salt, self.password_hash)
 
 class Session(Base):
     __tablename__ = 'sessions'
