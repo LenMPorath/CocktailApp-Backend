@@ -1,7 +1,8 @@
-# app/utils.py
+#core/security.py
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
-from app.config import REFRESH_TOKEN_EXPIRE_DAYS, SECRET_KEY, ALGORITHM
+import uuid
+from app.core.config import REFRESH_TOKEN_EXPIRE_DAYS, SECRET_KEY, ALGORITHM
 
 def create_access_token(data: dict, expires_delta: timedelta):
     to_encode = data.copy()
@@ -10,8 +11,13 @@ def create_access_token(data: dict, expires_delta: timedelta):
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 def create_refresh_token(data: dict):
+    to_encode = data.copy()
+    to_encode.update({
+        "type": "refresh",
+        "jti": str(uuid.uuid4()),  # Einmalige ID für Revokation
+    })
     expires_delta = timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
-    return create_access_token(data, expires_delta)
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 def verify_token(token: str):
     try:

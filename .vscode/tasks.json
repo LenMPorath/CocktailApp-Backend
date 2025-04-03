@@ -1,0 +1,33 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Install Dependencies",
+            "type": "shell",
+            "command": "pip install -r requiredLibs",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Enter Environment",
+            "type": "shell",
+            "command": "venv\\Scripts\\activate",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Application",
+            "type": "shell",
+            "command": "uvicorn app.main:app --reload",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Update Dependencies",
+            "type": "shell",
+            "command": "pip freeze > requiredLibs",
+            "group": "build",
+            "problemMatcher": []
+        }
+    ]
+}

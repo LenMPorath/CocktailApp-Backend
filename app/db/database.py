@@ -1,3 +1,4 @@
+#db/database.py
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -13,5 +14,7 @@ def get_db():
     db = SessionLocal()
     try:
         yield db
+    except Exception as e:
+        raise  # Exception weiterwerfen! Sonst schluckts alles!
     finally:
         db.close()

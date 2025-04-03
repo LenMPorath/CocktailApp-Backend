@@ -1,9 +1,10 @@
+#db/models.py
 import os
 from sqlalchemy import Boolean, Column, DateTime, Integer, Float, Enum, ForeignKey, String
 from sqlalchemy.orm import relationship
-from .database import Base
-from .enums import UnitEnum
 from passlib.context import CryptContext
+from .database import Base
+from ..enums import UnitEnum
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -12,8 +13,9 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True)
-    password_hash = Column(String, nullable=True)
-    salt = Column(String, nullable=True)
+    password_hash = Column(String)
+    salt = Column(String)
+    is_admin = Column(Boolean, default=False)
 
     orders = relationship("Order", back_populates="user")
     favorites = relationship("Favorite", back_populates="user")
@@ -27,6 +29,16 @@ class User(Base):
         """Verifiziert, ob das Passwort korrekt ist."""
         return pwd_context.verify(password + self.salt, self.password_hash)
 
+class SessionRecipe(Base):
+    __tablename__ = 'session_recipes'
+
+    id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(Integer, ForeignKey('sessions.id'))
+    recipe_id = Column(Integer, ForeignKey('recipes.id'))
+
+    session = relationship("Session", back_populates="available_recipes")
+    recipe = relationship("Recipe", back_populates="session_recipes")
+
 class Session(Base):
     __tablename__ = 'sessions'
 
@@ -37,6 +49,7 @@ class Session(Base):
     include_prices = Column(Boolean, default=False)
 
     orders = relationship("Order", back_populates="session")
+    available_recipes = relationship("SessionRecipe", back_populates="session")
 
 class Recipe(Base):
     __tablename__ = 'recipes'
@@ -49,6 +62,7 @@ class Recipe(Base):
     ingredients = relationship("RecipeIngredient", back_populates="recipe")
     orders = relationship("Order", back_populates="recipe")
     favorites = relationship("Favorite", back_populates="recipe")
+    session_recipes = relationship("SessionRecipe", back_populates="recipe")
 
 class Ingredient(Base):
     __tablename__ = 'ingredients'

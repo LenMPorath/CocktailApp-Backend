@@ -1,3 +1,4 @@
+#enums.py
 import enum
 
 # Enum für die Einheiten
